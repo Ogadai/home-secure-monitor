@@ -1,0 +1,44 @@
+
+.liveVideo {
+    position: relative;
+}
+
+.liveVideo canvas {
+    box-sizing: border-box;
+    border: 2px solid #282c34;
+}
+
+.motion canvas {
+    border: 2px solid #ac2c34;
+}
+
+.controls {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+}
+
+.controls button {
+    font-size: 2em;
+    line-height: 1em;
+    background-color: transparent;
+    color: white;
+    border: none;
+    cursor: pointer;
+    vertical-align: middle;
+    outline: none;
+}
+.controls button:hover {
+    color: #80a0ff;
+    border: none;
+}
+.controls button:active {
+    color: #4080ff;
+    border: none;
+}
+
+.name {
+    display: inline-block;
+    margin-right: 20px;
+    vertical-align: middle;
+}
