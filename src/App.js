@@ -3,8 +3,9 @@ import './App.css';
 import LiveVideo from './LiveVideo/LiveVideo';
 import JsmpVideo from './JsmpVideo/JsmpVideo';
 
+console.log(process.env)
 const address = document.location.href.startsWith('http://localhost')
-  ? 'http://192.168.8.201:45738/cameras'
+  ? `${process.env.REACT_APP_HOME_SECURE_SERVER}/cameras`
   : '/cameras';
 
 function App() {
