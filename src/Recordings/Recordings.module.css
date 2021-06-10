@@ -1,3 +1,73 @@
 .Recordings {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #282c34;
+}
 
+.Recordings_controls {
+  flex: 0 0 auto;
+}
+
+.Recordings_controls select {
+  margin: 5px 40px;
+  font-size: 2em;
+}
+
+.Recordings_list {
+  flex: 1 1 auto;
+  margin: 0 0 40px 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+}
+
+.Recordings_item {
+  height: 100%;
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.Recordings_item img {
+  height: 100%;
+}
+
+.Recordings_label {
+  pointer-events: none;
+  position: absolute;
+  bottom: 10px;
+  left: calc(50% - 50px);
+  color: white;
+  font-weight: bold;
+  padding: 5px 10px;
+  background-color: rgba(0, 140, 255, 0.5);
+}
+
+.Recordings_player {
+  z-index: 20;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #282c34;
+}
+
+.Recordings_close {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  right: 0;
+  padding: 5px 20px;
+  background-color: rgba(100, 40, 60, 0.5);
+  color: white;
+  font-weight: bold;
+  font-size: 2em;
+}
+.Recordings_close:hover {
+  background-color: rgba(200, 40, 60, 0.75);
 }
