@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react'
 import videoClient from './video-client';
 import styles from './LiveVideo.module.css';
 
-const LiveVideo = ({ name, url, className, onClick, size }) => {
+const LiveVideo = ({ name, url, onClick, size, selected }) => {
     const [videoState, setVideoState] = useState('off');
     const [videoSettings, setVideoSettings] = useState({});
     const [motion, setMotion] = useState(false);
@@ -20,11 +20,15 @@ const LiveVideo = ({ name, url, className, onClick, size }) => {
             }
         }
 
+        let closeFunction = null;
         if (videoState === 'off') {
             videoClient({
                 canvas: videoCanvas.current,
                 url,
-                onStart: setVideoSettings,
+                onStart: settings => {
+                    closeFunction = () => settings.close();
+                    setVideoSettings(settings);
+                },
                 onMessage
             });
             setVideoState('timelapse');
@@ -32,7 +36,7 @@ const LiveVideo = ({ name, url, className, onClick, size }) => {
 
         return () => {
             console.log('cleanup LiveVideo component');
-            if (videoSettings.close) videoSettings.close();
+            if (closeFunction) closeFunction();
         };
     }, [url]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -65,13 +69,13 @@ const LiveVideo = ({ name, url, className, onClick, size }) => {
     }
 
     return (
-        <div className={styles.liveVideo + (motion ? ' ' + styles.motion : '') + (className ? ' ' + className : '')}
-                style={size} onClick={onClick} ref={videoContainer}>
+        <div className={styles.liveVideo + (motion ? ' ' + styles.motion : '') + (selected ? ' ' + styles.liveVideoSelected : '')}
+                style={size} ref={videoContainer}>
             <div className={styles.controls}>
                 <span className={styles.name}>{name}</span>
                 <button onClick={togglePlay} className={videoState === 'on' ? 'fa fa-pause' : 'fa fa-play'}></button>
             </div>
-            <canvas className={styles.video} ref={videoCanvas} style={canvasStyle} />
+            <canvas className={styles.video} ref={videoCanvas} style={canvasStyle} onClick={onClick} />
         </div>
     );
 };

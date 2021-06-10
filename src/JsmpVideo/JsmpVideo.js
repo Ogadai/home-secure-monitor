@@ -2,7 +2,7 @@
 import React, { useRef, useEffect, useState } from 'react'
 import styles from './JsmpVideo.module.css';
 
-const JsmpVideo = ({ name, url, className, onClick, size }) => {
+const JsmpVideo = ({ name, url, onClick, size, selected }) => {
   const [videoSize, setVideoSize] = useState({ width: 300, height: 200 });
   const [player, setPlayer] = useState(null);
   const [canvasStyle, setCanvasStyle] = useState({});
@@ -11,11 +11,13 @@ const JsmpVideo = ({ name, url, className, onClick, size }) => {
   const videoContainer = useRef();
 
   useEffect(() => {
+    let createdPlayer = null;
     if (!player) {
-      setPlayer(new JSMpeg.Player(url, { canvas: videoCanvas.current }));
+      createdPlayer = new JSMpeg.Player(url, { canvas: videoCanvas.current });
+      setPlayer(createdPlayer);
 
       const checkForSize = () => {
-        if (videoCanvas && videoCanvas.current.attributes.width) {
+        if (videoCanvas && videoCanvas.current && videoCanvas.current.attributes.width) {
           setVideoSize({
             width: parseInt(videoCanvas.current.getAttribute('width')),
             height: parseInt(videoCanvas.current.getAttribute('height'))
@@ -29,7 +31,7 @@ const JsmpVideo = ({ name, url, className, onClick, size }) => {
 
     return () => {
         console.log('cleanup JsmpVideo component');
-        if (player) player.destroy();
+        if (createdPlayer) createdPlayer.destroy();
     };
   }, [url]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -41,15 +43,16 @@ const JsmpVideo = ({ name, url, className, onClick, size }) => {
       const scale = (containerRatio > videoRatio) ? size.height / videoSize.height : size.width / videoSize.width;
       setCanvasStyle({
         transform: `scale(${scale})`,
-        'transformOrigin': `${ (scale > 1 || containerRatio > videoRatio) ? 'center' : 'left'} top`
+        top: `calc(50% - ${videoSize.height / 2}px)`,
+        left: `calc(50% - ${videoSize.width / 2}px)`
       });
     }
   }, [videoSize, size]);
   
   return (
-    <div className={styles.jsmpVideo + (className ? ' ' + className : '')}
-            style={size} onClick={onClick} ref={videoContainer}>
-        <canvas ref={videoCanvas} style={canvasStyle} />
+    <div className={styles.jsmpVideo + (selected ? ' ' + styles.jsmpVideoSelected : '')}
+            style={size} ref={videoContainer}>
+        <canvas className={styles.jsmpCanvas} ref={videoCanvas} style={canvasStyle} onClick={onClick} />
     </div>
   );
 }
