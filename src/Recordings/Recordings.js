@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import groupRecordings from './group-recordings';
 import styles from './Recordings.module.css';
 
@@ -16,6 +16,9 @@ function Recordings() {
   const [day, setDay] = useState('');
   const [files, setFiles] = useState([]);
   const [selected, setSelected] = useState(null);
+
+  const imageCarousel = useRef();
+  const positionPanel = useRef();
 
   const cameraDays = () => {
     return camera ? cameras.find(c => c.name === camera).days : null;
@@ -50,6 +53,44 @@ function Recordings() {
     }
   }, [cameras, camera, day]);
 
+  const times = Array.from(Array(25).keys()).map(i => ({
+    label: i,
+    position: i / 24
+  }));
+
+  const positionTouchMove = (evt) => {
+    evt.preventDefault();
+    var touches = evt.changedTouches;
+    if (touches.length > 0) {
+      moveTo(touches[0].clientX);
+    }
+  }
+
+  const mouseMove = (evt) => {
+    evt.preventDefault();
+
+    if (evt.buttons > 0) {
+      moveTo(evt.clientX);
+    }
+  }
+
+  const moveTo = xPos => {
+    const position = xPos / positionPanel.current.clientWidth;
+    let entryIndex = 0;
+    while (entryIndex < files.length && position > files[entryIndex].position) {
+      entryIndex++;
+    }
+
+    if (entryIndex < files.length) {
+      const imageElement = imageCarousel.current.childNodes[entryIndex];
+      console.log(entryIndex, imageElement.offsetLeft)
+      imageCarousel.current.scrollLeft = imageElement.offsetLeft
+          - (imageCarousel.current.clientWidth - imageElement.clientWidth) / 2;
+    } else {
+      imageCarousel.current.scrollLeft = imageCarousel.current.scrollWidth - imageCarousel.current.clientWidth;
+    }
+  }
+
   return (
     <div className={ styles.Recordings }>
       <div className={ styles.Recordings_controls }>
@@ -70,14 +111,27 @@ function Recordings() {
         }
       </div>
 
-      <ul className={styles.Recordings_list}>
-        { files.map(file => 
-          <li className={styles.Recordings_item} key={file.image} onClick={() => setSelected(file)}>
-            <img src={`${address}recordings/files/${camera}/${day}/${file.image}`} alt={file.image} />
-            <span className={styles.Recordings_label}>{file.image.substring(0, file.image.indexOf('.')).replaceAll('-', ':')}</span>
-          </li>
-        )}
-      </ul>
+      <div className={styles.Recordings_container}>
+        <ul className={styles.Recordings_list} ref={imageCarousel}>
+          { files.map(file => 
+            <li className={styles.Recordings_item} key={file.image} onClick={() => setSelected(file)}>
+              <img src={`${address}recordings/files/${camera}/${day}/${file.image}`} alt={file.image} />
+              <span className={styles.Recordings_label}>{file.image.substring(0, file.image.indexOf('.')).replaceAll('-', ':')}</span>
+            </li>
+          )}
+        </ul>
+
+        <div className={styles.Recordings_overlay} ref={positionPanel}
+          onMouseDown={mouseMove} onMouseMove={mouseMove}
+          onTouchStart={positionTouchMove} onTouchMove={positionTouchMove}>
+            { files.map(file =>
+              <span className={styles.Recordings_position} style={{ left: `${file.position * 100}%` }} key={file.image}></span>
+            )}
+            { times.map(time =>
+              <span className={styles.Recordings_time} style={{ left: `${time.position * 100}%` }} key={time.label}>{String(time.label).padStart(2, '0')}</span>
+            )}
+        </div>
+      </div>
 
       { selected && <div className={styles.Recordings_player}>
         <div className={styles.Recordings_close} onClick={() => setSelected(null)}>X</div>

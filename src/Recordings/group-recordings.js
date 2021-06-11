@@ -10,6 +10,17 @@ const timeFromFile = file => {
 
 const secondsDiff = (file1, file2) => (timeFromFile(file2).getTime() - timeFromFile(file1).getTime()) / 1000;
 
+const getPosition = file => {
+  const time = timeFromFile(file);
+  
+  const date = new Date();
+  date.setHours(0,0,0,0);
+  const tomorrow = new Date(date);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  return (time.getTime() - date.getTime()) / (tomorrow.getTime() - date.getTime());
+} 
+
 export default function groupRecordings(files) {
   const images = [];
   let lastVideo = null;
@@ -23,6 +34,7 @@ export default function groupRecordings(files) {
 
       images.push({
         image: file,
+        position: getPosition(file),
         videos: []
       });
 
