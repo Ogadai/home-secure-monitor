@@ -6,10 +6,6 @@ const address = document.location.href.startsWith('http://localhost')
   ? `${process.env.REACT_APP_HOME_SECURE_SERVER}/`
   : '/';
 
-// /recordings/cameras
-// /recordings/clips/:name/:day
-// /recordings/files/:name/:day/:file
-
 function Recordings() {
   const [cameras, setCameras] = useState([]);
   const [camera, setCamera] = useState('');
@@ -43,7 +39,7 @@ function Recordings() {
       const fileData = await response.json();
       setFiles(groupRecordings(fileData.files));
     };
-  
+
     const camDays = camera ? cameras.find(c => c.name === camera).days : null;
     if (cameras && camera && (!day || !camDays.includes(day) )) {
       setDay(camDays[camDays.length - 1]);
@@ -91,11 +87,39 @@ function Recordings() {
     }
   }
 
+  const clickCamera = cam => {
+    setFiles([]);
+    setCamera(cam);
+  }
+
+  const clickDay = d => {
+    setFiles([]);
+    setDay(d);
+  }
+
+  const clickVideo = (evt, index) => {
+    evt.preventDefault();
+    setSelected({
+      file: selected.file,
+      index,
+      preventNext: true
+    })
+  }
+
+  const videoFinished = () => {
+    if (!selected.preventNext && selected.index < selected.file.videos.length - 1) {
+      setSelected({
+        file: selected.file,
+        index: selected.index + 1
+      })
+    }
+  }
+
   return (
     <div className={ styles.Recordings }>
       <div className={ styles.Recordings_controls }>
         { cameras &&
-          <select name="camera" value={camera} onChange={e => setCamera(e.target.value)}>
+          <select name="camera" value={camera} onChange={e => clickCamera(e.target.value)}>
             { cameras.map(cam =>
               <option value={cam.name} key={cam.name}>{cam.name}</option>)
             }
@@ -103,7 +127,7 @@ function Recordings() {
         }
 
         { cameraDays() &&
-          <select name="day" value={day} onChange={e => setDay(e.target.value)}>
+          <select name="day" value={day} onChange={e => clickDay(e.target.value)}>
             { cameraDays().map(d =>
               <option value={d} key={d}>{d}</option>)
             }
@@ -114,7 +138,7 @@ function Recordings() {
       <div className={styles.Recordings_container}>
         <ul className={styles.Recordings_list} ref={imageCarousel}>
           { files.map(file => 
-            <li className={styles.Recordings_item} key={file.image} onClick={() => setSelected(file)}>
+            <li className={styles.Recordings_item} key={file.image} onClick={() => setSelected({file, index: 0})}>
               <img src={`${address}recordings/files/${camera}/${day}/${file.image}`} alt={file.image} />
               <span className={styles.Recordings_label}>{file.image.substring(0, file.image.indexOf('.')).replaceAll('-', ':')}</span>
             </li>
@@ -135,10 +159,18 @@ function Recordings() {
 
       { selected && <div className={styles.Recordings_player}>
         <div className={styles.Recordings_close} onClick={() => setSelected(null)}>X</div>
+
+        <video controls autoPlay onEnded={() => videoFinished()}
+          src={`${address}recordings/files/${camera}/${day}/${selected.file.videos[selected.index]}`}
+        ></video>
+
         <ul className={styles.Recordings_videos}>
-          { selected.videos.map(video => 
-            <li className={styles.Recordings_video} key={video}>
-              <a href={`${address}recordings/files/${camera}/${day}/${video}`} target="_blank">{video}</a>
+          { selected.file.videos.map((video, index) => 
+            <li className={`${styles.Recordings_video} ${(index === selected.index) ? styles.Recordings_videoselected : ''}`} key={video}>
+              <a href={`${address}recordings/files/${camera}/${day}/${video}`}
+                onClick={evt => clickVideo(evt, index)}
+                >{video.substring(0, video.indexOf('.')).replaceAll('-', ':')}
+              </a>
             </li>
           )}
         </ul>

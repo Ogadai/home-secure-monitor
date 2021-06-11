@@ -93,6 +93,38 @@
   right: 0;
   bottom: 0;
   background-color: #282c34;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.Recordings_player video {
+  flex: 1 1 auto;
+  min-height: 100px;
+}
+
+.Recordings_videos {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.Recordings_video a {
+  padding: 10px;
+  color: #80a0ff;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-block;
+}
+.Recordings_video a:hover {
+  background-color: rgba(0, 140, 255, 0.2);
+}
+
+.Recordings_videoselected a {
+  background-color: rgba(0, 140, 255, 0.5);
+  color: white
+}
+.Recordings_videoselected a:hover {
+  background-color: rgba(0, 140, 255, 0.5);
 }
 
 .Recordings_close {
@@ -105,6 +137,7 @@
   color: white;
   font-weight: bold;
   font-size: 2em;
+  z-index: 40;
 }
 .Recordings_close:hover {
   background-color: rgba(200, 40, 60, 0.75);
