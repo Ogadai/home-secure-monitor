@@ -12,6 +12,7 @@ function Recordings() {
   const [day, setDay] = useState('');
   const [files, setFiles] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [imageSize, setImageSize] = useState({ width: 100, height: 100 });
 
   const imageCarousel = useRef();
   const positionPanel = useRef();
@@ -79,7 +80,6 @@ function Recordings() {
 
     if (entryIndex < files.length) {
       const imageElement = imageCarousel.current.childNodes[entryIndex];
-      console.log(entryIndex, imageElement.offsetLeft)
       imageCarousel.current.scrollLeft = imageElement.offsetLeft
           - (imageCarousel.current.clientWidth - imageElement.clientWidth) / 2;
     } else {
@@ -97,6 +97,13 @@ function Recordings() {
     setDay(d);
   }
 
+  const imageLoaded = (evt, i) => {
+    if (i === 0) {
+      const { width, height } = evt.target;
+      setImageSize({ width, height });
+    }
+  };
+
   const clickVideo = (evt, index) => {
     evt.preventDefault();
     setSelected({
@@ -113,6 +120,19 @@ function Recordings() {
         index: selected.index + 1
       })
     }
+  }
+
+  const renderFile = (file, i) => {
+    return (<li className={styles.Recordings_item} key={file.image}
+        onClick={() => setSelected({file, index: 0})}
+    >
+      <img src={`${address}recordings/files/${camera}/${day}/${file.image}`} alt={file.image}
+          onLoad={e => imageLoaded(e, i)}
+          width={i > 0 ? imageSize.width : ''}
+          height={i > 0 ? imageSize.height : ''}
+        />
+      <span className={styles.Recordings_label}>{file.image.substring(0, file.image.indexOf('.')).replaceAll('-', ':')}</span>
+    </li>);
   }
 
   return (
@@ -137,12 +157,7 @@ function Recordings() {
 
       <div className={styles.Recordings_container}>
         <ul className={styles.Recordings_list} ref={imageCarousel}>
-          { files.map(file => 
-            <li className={styles.Recordings_item} key={file.image} onClick={() => setSelected({file, index: 0})}>
-              <img src={`${address}recordings/files/${camera}/${day}/${file.image}`} alt={file.image} />
-              <span className={styles.Recordings_label}>{file.image.substring(0, file.image.indexOf('.')).replaceAll('-', ':')}</span>
-            </li>
-          )}
+          { files.map(renderFile) }
         </ul>
 
         <div className={styles.Recordings_overlay} ref={positionPanel}
