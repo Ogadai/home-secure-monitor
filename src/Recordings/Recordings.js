@@ -48,6 +48,15 @@ function Recordings() {
     if (camera && day) {
       getFiles(camera, day);
     }
+
+    const resetFiles = () => {
+      setFiles([]);
+      getFiles(camera, day);
+    }
+    window.addEventListener('resize', resetFiles);
+    return () => {
+      window.removeEventListener('resize', resetFiles);
+    }
   }, [cameras, camera, day]);
 
   const times = Array.from(Array(25).keys()).map(i => ({
