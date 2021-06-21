@@ -13,6 +13,7 @@ function Recordings() {
   const [files, setFiles] = useState([]);
   const [selected, setSelected] = useState(null);
   const [imageSize, setImageSize] = useState({ width: 100, height: 100 });
+  const [saved, setSaved] = useState([]);
 
   const imageCarousel = useRef();
   const positionPanel = useRef();
@@ -131,6 +132,28 @@ function Recordings() {
     }
   }
 
+  const saveSelected = async () => {
+    const file = `${camera}/${day}/${selected.file.videos[selected.index]}`;
+    if (!saved.includes(file)) {
+      setSaved(saved.concat([file]));
+
+      const response = await fetch(`${address}recordings/store/${file}`, { method: 'POST' });
+      if (!response.ok) {
+        let message = response.statusText;
+        try {
+          message = (await response.json()).error;
+        } catch(e) {
+        }
+        alert(message);
+      }
+    }
+  }
+
+  const isSaved = () => {
+    const file = `${camera}/${day}/${selected.file.videos[selected.index]}`;
+    return saved.includes(file);
+  }
+
   const renderFile = (file, i) => {
     return (<li className={styles.Recordings_item} key={file.image}
         onClick={() => setSelected({file, index: 0})}
@@ -182,7 +205,8 @@ function Recordings() {
       </div>
 
       { selected && <div className={styles.Recordings_player}>
-        <div className={styles.Recordings_close} onClick={() => setSelected(null)}>X</div>
+        <div className={styles.Recordings_save + ' fa fa-floppy-o'} onClick={() => saveSelected()} disabled={isSaved()}></div>
+        <div className={styles.Recordings_close + ' fa fa-times'} onClick={() => setSelected(null)}></div>
 
         <video controls autoPlay onEnded={() => videoFinished()}
           src={`${address}recordings/files/${camera}/${day}/${selected.file.videos[selected.index]}`}

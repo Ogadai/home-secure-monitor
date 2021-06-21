@@ -135,15 +135,32 @@
   background-color: rgba(0, 140, 255, 0.5);
 }
 
+.Recordings_save {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  padding: 5px 10px;
+  background-color: rgba(40, 100, 60, 0.5);
+  color: white;
+  font-size: 2em;
+  z-index: 40;
+}
+.Recordings_save:hover {
+  background-color: rgba(40, 100, 60, 0.75);
+}
+.Recordings_save[disabled], .Recordings_save[disabled]:hover {
+  background-color: rgba(100, 100, 100, 0.5);
+}
+
 .Recordings_close {
   position: absolute;
   cursor: pointer;
   top: 0;
   right: 0;
-  padding: 5px 20px;
+  padding: 5px 10px;
   background-color: rgba(100, 40, 60, 0.5);
   color: white;
-  font-weight: bold;
   font-size: 2em;
   z-index: 40;
 }
