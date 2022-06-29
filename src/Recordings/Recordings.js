@@ -9,6 +9,7 @@ const address = document.location.href.startsWith('http://localhost')
 function Recordings() {
   const [cameras, setCameras] = useState([]);
   const [camera, setCamera] = useState('');
+  const [imageUrl, setImageUrl] = useState(null);
   const [day, setDay] = useState('');
   const [files, setFiles] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -31,6 +32,7 @@ function Recordings() {
 
       const cam = cameraData.cameras[0];
       setCamera(cam.name);
+      setImageUrl(cam.url);
     }
     getCameras();
   }, []);
@@ -100,6 +102,9 @@ function Recordings() {
   const clickCamera = cam => {
     setFiles([]);
     setCamera(cam);
+
+    const camera = cameras.find(c => c.name === cam);
+    setImageUrl(camera ? camera.url : null);
   }
 
   const clickDay = d => {
@@ -155,16 +160,24 @@ function Recordings() {
   }
 
   const renderFile = (file, i) => {
+    const camUrl = imageUrl || `${address}recordings/files/${camera}`;
     return (<li className={styles.Recordings_item} key={file.image}
         onClick={() => setSelected({file, index: 0})}
     >
-      <img src={`${address}recordings/files/${camera}/${day}/${file.image}`} alt={file.image}
+      <img src={`${camUrl}/${day}/${file.image}`} alt={file.image}
           onLoad={e => imageLoaded(e, i)}
           width={i > 0 ? imageSize.width : ''}
           height={i > 0 ? imageSize.height : ''}
         />
       <span className={styles.Recordings_label}>{file.image.substring(0, file.image.indexOf('.')).replaceAll('-', ':')}</span>
     </li>);
+  }
+
+  const renderVideo = () => {
+    const camUrl = imageUrl || `${address}recordings/files/${camera}`;
+    return <video controls autoPlay onEnded={() => videoFinished()}
+      src={`${camUrl}/${day}/${selected.file.videos[selected.index]}`}
+    ></video>
   }
 
   return (
@@ -208,9 +221,7 @@ function Recordings() {
         <div className={styles.Recordings_save + ' fa fa-floppy-o'} onClick={() => saveSelected()} disabled={isSaved()}></div>
         <div className={styles.Recordings_close + ' fa fa-times'} onClick={() => setSelected(null)}></div>
 
-        <video controls autoPlay onEnded={() => videoFinished()}
-          src={`${address}recordings/files/${camera}/${day}/${selected.file.videos[selected.index]}`}
-        ></video>
+        { renderVideo() }
 
         <ul className={styles.Recordings_videos}>
           { selected.file.videos.map((video, index) => 
