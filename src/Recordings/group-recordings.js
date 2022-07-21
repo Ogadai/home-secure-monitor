@@ -2,28 +2,34 @@ const timeFromFile = file => {
   const parts = file.substring(0, file.indexOf('.')).split('-');
 
   const date = new Date();
-  date.setHours(parts[0]);
-  date.setMinutes(parts[1]);
-  date.setSeconds(parts[2]);
+  let index = 0;
+  if (parts.length >= 6) {
+    date.setFullYear(parts[index++]);
+    date.setMonth(parts[index++] - 1);
+    date.setDate(parts[index++]);
+  }
+  date.setHours(parts[index++]);
+  date.setMinutes(parts[index++]);
+  date.setSeconds(parts[index++]);
   return date;
 };
 
 const secondsDiff = (file1, file2) => (timeFromFile(file2).getTime() - timeFromFile(file1).getTime()) / 1000;
 
-const getPosition = file => {
+const getPosition = (file, startDate, endDate) => {
   const time = timeFromFile(file);
-  
-  const date = new Date();
-  date.setHours(0,0,0,0);
-  const tomorrow = new Date(date);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  return (time.getTime() - date.getTime()) / (tomorrow.getTime() - date.getTime());
+  return (time.getTime() - startDate.getTime()) / (endDate.getTime() - startDate.getTime());
 } 
 
 export default function groupRecordings(files) {
   const images = [];
   let lastVideo = null;
+
+  const startDate = timeFromFile(files[0]);
+  startDate.setHours(0,0,0,0);
+  const endDate = timeFromFile(files[files.length - 1]);
+  endDate.setHours(0,0,0,0);
+  endDate.setDate(endDate.getDate() + 1);
 
   files.forEach(file => {
     if (file.endsWith('.jpg')) {
@@ -34,7 +40,7 @@ export default function groupRecordings(files) {
 
       images.push({
         image: file,
-        position: getPosition(file),
+        position: getPosition(file, startDate, endDate),
         videos: []
       });
 

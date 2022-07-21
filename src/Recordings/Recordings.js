@@ -41,7 +41,7 @@ function Recordings() {
     const getFiles = async (camera, day) => {
       const response = await fetch(`${address}recordings/clips/${camera}/${day}`);
       const fileData = await response.json();
-      setFiles(groupRecordings(fileData.files));
+      setFiles(groupRecordings(fileData.files.filter(f => f !== 'Thumbs.db')));
     };
 
     const camDays = camera ? cameras.find(c => c.name === camera).days : null;
