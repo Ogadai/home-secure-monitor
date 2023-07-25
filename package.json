@@ -16,8 +16,8 @@
     "clean": "rimraf //garage/PiShare/Projects/MyHomeSecureHub/public/*",
     "deploy": "copyfiles -u 1 build/**/* //garage/PiShare/Projects/MyHomeSecureHub/public/",
     "publish": "npm run build & npm run deploy",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "react-scripts --openssl-legacy-provider start",
+    "build": "react-scripts --openssl-legacy-provider build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
